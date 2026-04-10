@@ -1,30 +1,46 @@
-import React, { useState } from 'react';
-import logo from "../../assets/logo.png"; // correct relative path
-import LoginButton from './LoginButton';
-const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+import React from "react";
+import logo from "../../assets/logo.png";
+import LoginButton from "./LoginButton";
 
+const Navbar = () => {
+
+  const scrolltosection = (id) => {
+    const element = document.getElementById(id)
+    element?.scrollIntoView({ behavior: "smooth" });
+
+  }
   return (
-    <nav className="bg-white shadow-md w-full z-20 top-0 left-0">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-white w-full fixed top-0 left-0 z-50 ">
+      <div className="max-w-7xl mx-auto px-6">
+        
         <div className="flex items-center justify-between h-16">
           
-          {/* Logo Section */}
-          <div className="">
-            <img src={logo} alt="logo"  className='w-32 h-32 object-fit'/>
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <img
+              src={logo}
+              alt="logo"
+              className="w-24 object-contain"
+            />
           </div>
 
+          {/* Center Links */}
+          <div className="hidden md:flex items-center gap-8 text-sm text-gray-600">
+            <span onClick={()=> scrolltosection ("home")} className="hover:text-black cursor-pointer">Home</span>
+            <span onClick={()=> scrolltosection ("features")}className="hover:text-black cursor-pointer">Feature</span>
+            <span onClick={()=> scrolltosection ("footer")}className="hover:text-black cursor-pointer">footer</span>
+          </div>
 
-          {/* Desktop Menu */}
-          <div className="md:flex space-x-8 items-center">
-            <LoginButton/>
+          {/* Right Buttons */}
+          <div className="flex items-center gap-4">
+<LoginButton/>
 
-          </div>          
+          </div>
+
         </div>
       </div>
-
     </nav>
   );
-}
+};
 
 export default Navbar;
