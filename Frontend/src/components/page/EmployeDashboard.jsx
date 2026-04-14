@@ -4,19 +4,18 @@ import { account } from "../../appwriteConfig";
 import useAuthStore from "../../store/authStore";
 
 const EmployeDashboard = () => {
-
-  const setUser = useAuthStore((s)=>s.setUser)
+  const setUser = useAuthStore((s) => s.setUser);
   const navigate = useNavigate();
 
-  const handlelogout  = async ()=>{
+  const handlelogout = async () => {
     try {
-      await account.deleteSession("current")
+      await account.deleteSession("current");
       setUser(null);
-      navigate("/")
+      navigate("/");
     } catch (error) {
-      console.log("logout erroe",error)
+      console.log("logout erroe", error);
     }
-  }
+  };
   const user = {
     name: "John Doe",
     role: "Employee",
@@ -30,12 +29,7 @@ const EmployeDashboard = () => {
     { title: "Rejected", value: 1 },
   ];
 
-  const actions = [
-    "Apply Leave",
-    "View Status",
-    "Leave History",
-    "Profile",
-  ];
+  const actions = ["Apply Leave", "View Status", "Leave History", "Profile"];
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -76,7 +70,7 @@ const EmployeDashboard = () => {
             </button>
           ))}
 
-          <button onClick={handlelogout} >logout</button>
+          <button onClick={handlelogout}>logout</button>
         </div>
       </div>
     </div>

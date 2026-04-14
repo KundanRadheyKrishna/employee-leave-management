@@ -4,7 +4,6 @@ import heroImg from "../../assets/hero.png";
 import LoginButton from "../common/LoginButton";
 import useAuthStore from "../../store/authStore";
 import LoginForm from "./LoginForm";
-import EmployeDashboard from "./EmployeDashboard";
 
 const LandingPage = () => {
   const showLogin = useAuthStore((s) => s.showLogin);
@@ -14,7 +13,11 @@ const LandingPage = () => {
   return (
     <div className="pt-0 bg-white min-h-screen">
       <Navbar />
-      {showLogin && ( <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"><LoginForm closeLogin={closeLogin} /></div> )}
+      {showLogin && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <LoginForm closeLogin={closeLogin} />
+        </div>
+      )}
 
       {/* Hero Section */}
       <section
@@ -92,7 +95,6 @@ const LandingPage = () => {
           © 2026 Employee Leave Management System. All rights reserved.
         </p>
       </footer>
-
     </div>
   );
 };
