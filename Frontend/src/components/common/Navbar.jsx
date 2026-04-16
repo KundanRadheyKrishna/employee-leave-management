@@ -52,7 +52,7 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             {/* Desktop Auth Button */}
             <div className="hidden md:block">
-              <SkeletonWrapper loading={loading} type="button">
+              <SkeletonWrapper loading={loading}  width={37} height={20}>
                 {user ? (
                   <LogoutButton onClick={logout} />
                 ) : (
