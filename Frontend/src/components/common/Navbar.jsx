@@ -3,6 +3,7 @@ import logo from "../../assets/logo.png";
 import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 import useAuthStore from "../../store/authStore";
+import SkeletonWrapper from "./SkeletonWrapper";
 
 const Navbar = () => {
   const user = useAuthStore((s) => s.user);
@@ -46,10 +47,13 @@ const Navbar = () => {
 
           {/* Right Buttons */}
           <div className="flex items-center gap-4">
-            {loading ? null : user 
-  ? <LogoutButton onClick={logout} /> 
-  : <LoginButton onClick={openLogin} />
-}
+            <SkeletonWrapper loading={loading} width={90} height={36}>
+    {user ? (
+      <LogoutButton onClick={logout} />
+    ) : (
+      <LoginButton onClick={openLogin} />
+    )}
+  </SkeletonWrapper>
           </div>
         </div>
       </div>
