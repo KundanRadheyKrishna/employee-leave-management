@@ -23,11 +23,11 @@ const LoginForm = () => {
 
     try {
       // 🔥 old session delete
-      try {
-        await account.deleteSession("current");
-      } catch {
-        console.log("no active session");
-      }
+      // try {
+      //   await account.deleteSession("current");
+      // } catch {
+      //   console.log("no active session");
+      // }
 
       // 🔥 login
       await account.createEmailPasswordSession(email, password);
