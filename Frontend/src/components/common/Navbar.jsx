@@ -1,9 +1,13 @@
 import React from "react";
 import logo from "../../assets/logo.png";
 import LoginButton from "./LoginButton";
+import LogoutButton from "./LogoutButton";
 import useAuthStore from "../../store/authStore";
 
 const Navbar = () => {
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const loading = useAuthStore((s) => s.loading);
   const openLogin = useAuthStore((s) => s.openLogin);
   const scrolltosection = (id) => {
     const element = document.getElementById(id);
@@ -42,7 +46,10 @@ const Navbar = () => {
 
           {/* Right Buttons */}
           <div className="flex items-center gap-4">
-            <LoginButton onClick={openLogin} />
+            {loading ? null : user 
+  ? <LogoutButton onClick={logout} /> 
+  : <LoginButton onClick={openLogin} />
+}
           </div>
         </div>
       </div>

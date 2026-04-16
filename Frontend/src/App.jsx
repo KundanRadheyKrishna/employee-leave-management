@@ -7,7 +7,8 @@ import HodDashboard from "./components/page/HodDashboard";
 import VcDashboard from "./components/page/VcDashboard";
 import AdminDashboard from "./components/page/AdminDashboard";
 import ProtectedRoute from "./utils/ProtectedRoute";
-
+import useAuthStore from "./store/authStore";
+import { account } from "./appwriteConfig";
 const App = () => {
   const { pathname } = useLocation();
   if ("scrollRestoration" in window.history) {
@@ -16,7 +17,24 @@ const App = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+useEffect(() => {
+    const checkUser = async () => {
+      const { setUser, setLoading } = useAuthStore.getState();
+      try {
+        const user = await account.get();
 
+        useAuthStore.getState().setUser({
+          id: user.$id,
+          email: user.email
+        });
+
+      } catch {
+        useAuthStore.getState().setUser(null);
+      } finally {setLoading(false); }
+    };
+
+    checkUser();
+  }, []);
   return (
     <div>
       <Routes>

@@ -7,15 +7,15 @@ const AdminDashboard = () => {
   const setUser = useAuthStore((s) => s.setUser);
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      await account.deleteSession("current");
-      setUser(null);
-      navigate("/");
-    } catch (err) {
-      console.log("logout error", err);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await account.deleteSession("current");
+  //     setUser(null);
+  //     navigate("/");
+  //   } catch (err) {
+  //     console.log("logout error", err);
+  //   }
+  // };
 
   const stats = [
     { title: "Total Employees", value: 120 },
@@ -43,12 +43,12 @@ const AdminDashboard = () => {
           <p className="text-gray-500">Full system control & management</p>
         </div>
 
-        <button
+        {/* <button
           onClick={handleLogout}
           className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
         >
           Logout
-        </button>
+        </button> */}
       </div>
 
       {/* Stats */}
