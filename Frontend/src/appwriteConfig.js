@@ -28,3 +28,4 @@ export const tablesDB = new TablesDB(client);
 // ✅ IDs
 export const DB_ID = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 export const USER_TABLE_ID = import.meta.env.VITE_APPWRITE_USER_COLLECTION_ID;
+export const LEAVE_TABLE_ID = import.meta.env.VITE_APPWRITE_LEAVES_TABLE_ID;

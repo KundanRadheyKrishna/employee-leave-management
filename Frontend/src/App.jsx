@@ -18,23 +18,30 @@ const App = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
 useEffect(() => {
-    const checkUser = async () => {
-      const { setUser, setLoading } = useAuthStore.getState();
-      try {
-        const user = await account.get();
+  const checkUser = async () => {
+    const { setUser, setLoading } = useAuthStore.getState();
 
-        useAuthStore.getState().setUser({
-          id: user.$id,
-          email: user.email
-        });
+    try {
+      const user = await account.get();
 
-      } catch {
-        useAuthStore.getState().setUser(null);
-      } finally {setLoading(false); }
-    };
+      setUser({
+        $id: user.$id,
+        email: user.email,
+        name: user.name,
+        department_id: user.department_id,
+        manager_id: user.manager_id,
+        role: user.role,
+      });
 
-    checkUser();
-  }, []);
+    } catch (err) {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  checkUser();
+}, []);
   return (
     <div>
       <Routes>

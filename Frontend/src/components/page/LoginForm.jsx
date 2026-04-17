@@ -10,7 +10,8 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
 
-  const { setUser } = useAuthStore();
+  // const { setUser } = useAuthStore();
+  const setUser = useAuthStore((s) => s.setUser);
   const navigate = useNavigate();
 
   const handlsubmit = async (e) => {
@@ -48,6 +49,8 @@ const LoginForm = () => {
         id: user.$id,
         email: user.email,
         role,
+          department_id: userRow.department_id,   // 🔥 REQUIRED
+  manager_id: userRow.manager_id,         // 🔥 REQUIRED
       });
 
       setEmail("");

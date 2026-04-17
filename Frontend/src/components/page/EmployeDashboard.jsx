@@ -1,81 +1,105 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { account } from "../../appwriteConfig";
 import useAuthStore from "../../store/authStore";
 
-const EmployeDashboard = () => {
+import ApplyLeave from "../common/ApplyLeave";
+import LeaveHistory from "../common/LeaveHistory";
+import Notifications from "../common/Notifications";
+
+import { Menu } from "lucide-react";
+
+const EmployeeDashboard = () => {
   const setUser = useAuthStore((s) => s.setUser);
   const navigate = useNavigate();
 
-  const handlelogout = async () => {
+  const [activeTab, setActiveTab] = useState("apply");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = async () => {
     try {
       await account.deleteSession("current");
       setUser(null);
       navigate("/");
-    } catch (error) {
-      console.log("logout erroe", error);
+    } catch (err) {
+      console.log("logout error", err);
     }
   };
-  const user = {
-    name: "John Doe",
-    role: "Employee",
-    department: "IT",
-  };
 
-  const stats = [
-    { title: "Total Leaves", value: 12 },
-    { title: "Approved", value: 8 },
-    { title: "Pending", value: 3 },
-    { title: "Rejected", value: 1 },
+  const menuItems = [
+    { id: "apply", label: "Apply Leave" },
+    { id: "history", label: "Leave History" },
+    { id: "notifications", label: "Notifications" },
   ];
 
-  const actions = ["Apply Leave", "View Status", "Leave History", "Profile"];
-
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      {/* Header */}
-      <div className="bg-white p-6 rounded-2xl shadow mb-6">
-        <h1 className="text-2xl font-bold">Employee Dashboard</h1>
-        <p className="text-gray-600">
-          Welcome, <span className="font-semibold">{user.name}</span>
-        </p>
-        <p className="text-sm text-gray-500">
-          {user.role} • {user.department}
-        </p>
+    <div className="min-h-screen flex bg-green-50">
+
+      {/* MOBILE TOP BAR */}
+      <div className="md:hidden fixed top-0 left-0 right-0 bg-white shadow p-4 flex justify-between items-center z-50">
+        <h1 className="font-bold text-green-700">Employee Panel</h1>
+        <button onClick={() => setSidebarOpen(!sidebarOpen)}>
+          <Menu />
+        </button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {stats.map((item, index) => (
-          <div
-            key={index}
-            className="bg-white p-4 rounded-xl shadow text-center"
+      {/* SIDEBAR */}
+      <div
+        className={`fixed md:static top-0 left-0 h-full w-64 bg-white shadow-lg p-5 transform transition-transform duration-300 z-40
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
+      >
+        <h1 className="text-xl font-bold text-green-700 mb-6 hidden md:block">
+          Employee Panel
+        </h1>
+
+        {menuItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => {
+              setActiveTab(item.id);
+              setSidebarOpen(false);
+            }}
+            className={`w-full text-left p-3 rounded-lg mb-2 transition
+              ${
+                activeTab === item.id
+                  ? "bg-green-100 text-green-800 font-semibold"
+                  : "hover:bg-green-50"
+              }`}
           >
-            <p className="text-gray-500 text-sm">{item.title}</p>
-            <p className="text-xl font-bold">{item.value}</p>
-          </div>
+            {item.label}
+          </button>
         ))}
+
+        <button
+          onClick={handleLogout}
+          className="w-full mt-6 bg-red-500 text-white p-2 rounded-lg hover:bg-red-600"
+        >
+          Logout
+        </button>
       </div>
 
-      {/* Actions */}
-      <div className="bg-white p-6 rounded-2xl shadow">
-        <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {actions.map((action, index) => (
-            <button
-              key={index}
-              className="bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
-            >
-              {action}
-            </button>
-          ))}
+      {/* OVERLAY (mobile) */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black/40 md:hidden"
+        />
+      )}
 
+      {/* MAIN CONTENT */}
+      <div className="flex-1 p-4 md:p-8 md:ml-64 mt-16 md:mt-0">
 
-          <button onClick={handlelogout}>logout</button>
+        <div className="bg-white shadow rounded-2xl p-5 border border-green-100">
+
+          {activeTab === "apply" && <ApplyLeave />}
+          {activeTab === "history" && <LeaveHistory />}
+          {activeTab === "notifications" && <Notifications />}
+
         </div>
+
       </div>
     </div>
   );
 };
 
-export default EmployeDashboard;
+export default EmployeeDashboard;
