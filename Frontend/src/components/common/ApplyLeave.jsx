@@ -1,232 +1,3 @@
-// import React, { useState } from "react";
-// import { tablesDB, DB_ID, LEAVE_TABLE_ID } from "../../appwriteConfig";
-// import useAuthStore from "../../store/authStore";
-
-// const ApplyLeave = () => {
-//   const user = useAuthStore((s) => s.user);
-// console.log("USER:", user);
-//   const [form, setForm] = useState({
-//     from: "",
-//     to: "",
-//     reason: "",
-//   });
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     // 🔥 SAFETY CHECK (MOST IMPORTANT)
-//     if (!user || !user.id) {
-//       alert("User not logged in");
-//       return;
-//     }
-
-//     if (!user.department_id || !user.manager_id) {
-//       alert("User department or manager not assigned");
-//       return;
-//     }
-
-//     if (!form.from || !form.to || !form.reason) {
-//       alert("All fields are required");
-//       return;
-//     }
-
-//     try {
-//       await tablesDB.createRow(
-//         DB_ID,
-//         LEAVE_TABLE_ID,
-//         "unique()",
-//         {
-//           user_id: user.id,
-//           department_id: user.department_id,
-//           approver_id: user.manager_id, // HOD only
-//           from_date: form.from,
-//           to_date: form.to,
-//           reason: form.reason,
-//           status: "pending",
-//           current_level: "hod",
-//           created_at: new Date().toISOString(),
-//         }
-//       );
-
-//       alert("Leave applied successfully");
-
-//       setForm({ from: "", to: "", reason: "" });
-
-//     } catch (err) {
-//       console.log("Apply leave error:", err);
-//       alert(err.message || "Failed to apply leave");
-//     }
-//   };
-
-//   return (
-//     <div className="bg-white p-6 rounded-xl shadow max-w-xl">
-//       <h2 className="text-xl font-bold mb-4">Apply Leave</h2>
-
-//       <form onSubmit={handleSubmit} className="space-y-3">
-
-//         <input
-//           type="date"
-//           className="w-full border p-2 rounded"
-//           value={form.from}
-//           onChange={(e) => setForm({ ...form, from: e.target.value })}
-//         />
-
-//         <input
-//           type="date"
-//           className="w-full border p-2 rounded"
-//           value={form.to}
-//           onChange={(e) => setForm({ ...form, to: e.target.value })}
-//         />
-
-//         <textarea
-//           className="w-full border p-2 rounded"
-//           placeholder="Reason"
-//           value={form.reason}
-//           onChange={(e) => setForm({ ...form, reason: e.target.value })}
-//         />
-
-//         <button className="bg-green-600 text-white w-full py-2 rounded">
-//           Submit Leave
-//         </button>
-
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default ApplyLeave;
-
-// import React, { useState } from "react";
-// import { tablesDB, DB_ID, LEAVE_TABLE_ID } from "../../appwriteConfig";
-// import useAuthStore from "../../store/authStore";
-
-// const ApplyLeave = () => {
-//   const user = useAuthStore((s) => s.user);
-
-//   const [form, setForm] = useState({
-//     from: "",
-//     to: "",
-//     reason: "",
-//     leave_type: "",
-//   });
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     if (!user || !user.id) {
-//       alert("User not logged in");
-//       return;
-//     }
-
-//     if (!user.department_id || !user.manager_id) {
-//       alert("User department or manager not assigned");
-//       return;
-//     }
-
-//     if (!form.from || !form.to || !form.reason || !form.leave_type) {
-//       alert("All fields are required");
-//       return;
-//     }
-
-//     try {
-//       await tablesDB.createRow(DB_ID, LEAVE_TABLE_ID, "unique()", {
-//         user_id: user.id,
-//         department_id: user.department_id,
-//         approver_id: user.manager_id,
-//         leave_type: form.leave_type,
-//         from_date: form.from,
-//         to_date: form.to,
-//         reason: form.reason,
-//         status: "pending",
-//         current_level: "hod",
-//         created_at: new Date().toISOString(),
-//       });
-
-//       alert("Leave applied successfully");
-//       setForm({ from: "", to: "", reason: "", leave_type: "" });
-
-//     } catch (err) {
-//       console.log("Apply leave error:", err);
-//       alert(err.message || "Failed to apply leave");
-//     }
-//   };
-
-//   return (
-//     <div className="bg-white p-6 rounded-xl shadow max-w-xl">
-//       <h2 className="text-xl font-bold mb-4">Apply Leave</h2>
-
-//       {/* 🔒 READ ONLY USER INFO */}
-//       <div className="space-y-2 mb-4">
-//         <input
-//           type="text"
-//           className="w-full border p-2 rounded bg-gray-100"
-//           value={user?.email || ""}
-//           readOnly
-//         />
-
-//         <input
-//           type="text"
-//           className="w-full border p-2 rounded bg-gray-100"
-//           value={user?.department_id || ""}
-//           readOnly
-//         />
-
-//         <input
-//           type="text"
-//           className="w-full border p-2 rounded bg-gray-100"
-//           value={user?.manager_id || ""}
-//           readOnly
-//         />
-//       </div>
-
-//       <form onSubmit={handleSubmit} className="space-y-3">
-
-//         {/* Leave Type */}
-//         <select
-//           className="w-full border p-2 rounded"
-//           value={form.leave_type}
-//           onChange={(e) => setForm({ ...form, leave_type: e.target.value })}
-//         >
-//           <option value="">Select Leave Type</option>
-//           <option value="casual">Casual</option>
-//           <option value="sick">Sick</option>
-//           <option value="paid">Paid</option>
-//         </select>
-
-//         {/* Dates */}
-//         <input
-//           type="date"
-//           className="w-full border p-2 rounded"
-//           value={form.from}
-//           onChange={(e) => setForm({ ...form, from: e.target.value })}
-//         />
-
-//         <input
-//           type="date"
-//           className="w-full border p-2 rounded"
-//           value={form.to}
-//           onChange={(e) => setForm({ ...form, to: e.target.value })}
-//         />
-
-//         {/* Reason */}
-//         <textarea
-//           className="w-full border p-2 rounded"
-//           placeholder="Reason"
-//           value={form.reason}
-//           onChange={(e) => setForm({ ...form, reason: e.target.value })}
-//         />
-
-//         <button className="bg-green-600 text-white w-full py-2 rounded">
-//           Submit Leave
-//         </button>
-
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default ApplyLeave;
-
 import React, { useState } from "react";
 import { tablesDB, DB_ID, LEAVE_TABLE_ID } from "../../appwriteConfig";
 import useAuthStore from "../../store/authStore";
@@ -249,7 +20,11 @@ const ApplyLeave = () => {
       return;
     }
 
-    if (!user.department_id || !user.manager_id) {
+    // employee + hod ke liye required
+    if (
+      (user.role === "employee" || user.role === "hod") &&
+      (!user.department_id || !user.manager_id)
+    ) {
       alert("User department or manager not assigned");
       return;
     }
@@ -259,21 +34,43 @@ const ApplyLeave = () => {
       return;
     }
 
+    // 🔥 ROLE-BASED LOGIC
+    let approverId = null;
+    let level = "";
+    let status = "pending";
+
+    if (user.role === "employee") {
+      approverId = user.manager_id; // HOD
+      level = "hod";
+    } else if (user.role === "hod") {
+      approverId = user.manager_id; // VC
+      level = "vc";
+    } else if (user.role === "vc") {
+      approverId = null;
+      level = "vc";
+      status = "approved"; // 🔥 auto approve
+    }
+
     try {
       await tablesDB.createRow(DB_ID, LEAVE_TABLE_ID, "unique()", {
         user_id: user.id,
         department_id: user.department_id,
-        approver_id: user.manager_id,
+        approver_id: approverId,
         leave_type: form.leave_type,
         from_date: form.from,
         to_date: form.to,
         reason: form.reason,
-        status: "pending",
-        current_level: "hod",
+        status: status,
+        current_level: level,
         created_at: new Date().toISOString(),
       });
 
-      alert("Leave applied successfully");
+      alert(
+        user.role === "vc"
+          ? "Leave auto-approved"
+          : "Leave applied successfully"
+      );
+
       setForm({ from: "", to: "", reason: "", leave_type: "" });
 
     } catch (err) {
@@ -286,7 +83,7 @@ const ApplyLeave = () => {
     <div className="bg-white p-6 rounded-xl shadow max-w-xl">
       <h2 className="text-xl font-bold mb-4">Apply Leave</h2>
 
-      {/* 🔒 READ ONLY USER INFO */}
+      {/* 🔒 USER INFO (READ ONLY) */}
       <div className="space-y-3 mb-4">
 
         <div>
