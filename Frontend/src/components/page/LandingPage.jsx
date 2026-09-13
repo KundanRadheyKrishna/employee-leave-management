@@ -2,27 +2,28 @@ import React, { useState } from "react";
 import Navbar from "../common/Navbar";
 import heroImg from "../../assets/hero.png";
 import LoginButton from "../common/LoginButton";
+import LogoutButton from "../common/LogoutButton";
 import useAuthStore from "../../store/authStore";
 import LoginForm from "./LoginForm";
 import { account } from "../../appwriteConfig";
-
+import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
   const setUser = useAuthStore((s) => s.setUser);
-
   const showLogin = useAuthStore((s) => s.showLogin);
   const openLogin = useAuthStore((s) => s.openLogin);
   const closeLogin = useAuthStore((s) => s.closeLogin);
 
-    const handleLogout = async () => {
-      try {
-        await account.deleteSession("current");
-        setUser(null);
-        navigate("/");
-      } catch (err) {
-        console.log("logout error", err);
-      }
-    };
+
+  const handleLogout = async () => {
+    try {
+      await account.deleteSession("current");
+      setUser(null);
+      navigate("/");
+    } catch (err) {
+      console.log("logout error", err);
+    }
+  };
 
   return (
     <div className="pt-0 bg-white min-h-screen">
@@ -32,8 +33,6 @@ const LandingPage = () => {
           <LoginForm closeLogin={closeLogin} />
         </div>
       )}
-
-      
 
       {/* Hero Section */}
       <section
@@ -52,14 +51,6 @@ const LandingPage = () => {
             One system for Employees, HODs, and VCs to manage leave requests and
             approvals effortlessly.
           </p>
-
-          <LoginButton onClick={openLogin} />
-          <button
-          onClick={handleLogout}
-          className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-        >
-          Logout
-        </button>
         </div>
 
         {/* Right Image */}

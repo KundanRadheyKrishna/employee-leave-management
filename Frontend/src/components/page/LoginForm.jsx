@@ -50,8 +50,8 @@ const LoginForm = () => {
         email: user.email,
         role,
         name: userRow.name,
-          department_id: userRow.department_id,   // 🔥 REQUIRED
-  manager_id: userRow.manager_id,         // 🔥 REQUIRED
+        department_id: userRow.department_id,   // 🔥 REQUIRED
+        manager_id: userRow.manager_id,         // 🔥 REQUIRED
       });
 
       setEmail("");

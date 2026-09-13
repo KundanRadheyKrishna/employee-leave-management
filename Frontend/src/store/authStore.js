@@ -1,5 +1,4 @@
 import { create } from "zustand";
-// import { account } from "../lib/appwrite"; // apna path
 import { account, tablesDB, DB_ID, USER_TABLE_ID } from "../appwriteConfig";
 
 const useAuthStore = create((set) => ({

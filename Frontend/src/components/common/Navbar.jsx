@@ -18,15 +18,13 @@ const Navbar = () => {
 
   // 🔥 role-based routing
   const getDashboardRoute = () => {
-    if (!user || !user.role) return null;
-
+    if (!user || !user.role) return null;  
     const routes = {
       employee: "/employee-dashboard",
       hod: "/hod-dashboard",
       vc: "/vc-dashboard",
       admin: "/admin-dashboard",
     };
-
     return routes[user.role] || null;
   };
 
@@ -34,7 +32,6 @@ const Navbar = () => {
   const handleDashboardClick = () => {
     const route = getDashboardRoute();
     if (!route) return;
-
     navigate(route);
   };
 
