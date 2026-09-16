@@ -1,131 +1,134 @@
 import React, { useState } from "react";
-import useAuthStore from "../../store/authStore";
 import { useNavigate } from "react-router-dom";
-import { account, tablesDB, DB_ID, USER_TABLE_ID } from "../../appwriteConfig";
+import useAuthStore from "../../store/authStore";
+import { account, DB_ID, tablesDB, USER_TABLE_ID } from "../../appwriteConfig";
+import { roleDashboard } from "../../utils/leaveRules";
 
 const LoginForm = () => {
-  const closeLogin = useAuthStore((s)=> s.closeLogin);
-
+  const navigate = useNavigate();
+  const closeLogin = useAuthStore((state) => state.closeLogin);
+  const setUser = useAuthStore((state) => state.setUser);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [show, setShow] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [mustReset, setMustReset] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // const { setUser } = useAuthStore();
-  const setUser = useAuthStore((s) => s.setUser);
-  const navigate = useNavigate();
+  const finishLogin = (user, profile) => {
+    const nextUser = {
+      id: user.$id,
+      email: user.email,
+      name: profile.name || user.name || user.email,
+      role: profile.role,
+      department_id: profile.department_id || "",
+      manager_id: profile.manager_id || "",
+      leave_balance: Number(profile.leave_balance ?? 20),
+      avatar_url: profile.avatar_url || "",
+      first_login: Boolean(profile.first_login),
+    };
+    if (!roleDashboard[nextUser.role]) throw new Error("Your account has no valid role.");
+    setUser(nextUser);
+    closeLogin();
+    navigate(roleDashboard[nextUser.role], { replace: true });
+  };
 
-  const handlsubmit = async (e) => {
-    e.preventDefault();
+  const submit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      await account.createEmailPasswordSession(email.trim(), password);
+      const current = await account.get();
+      const profile = await tablesDB.getRow(DB_ID, USER_TABLE_ID, current.$id);
+      if (profile.first_login) {
+        setMustReset(true);
+      } else {
+        finishLogin(current, profile);
+      }
+    } catch (loginError) {
+      setError(loginError.message || "Invalid email or password.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    if (!email || !password) {
-      alert("Fill All Fields");
+  const resetPassword = async (event) => {
+    event.preventDefault();
+    if (newPassword.length < 8) {
+      setError("New password must contain at least 8 characters.");
       return;
     }
-
+    setLoading(true);
+    setError("");
     try {
-      // 🔥 old session delete
-      // try {
-      //   await account.deleteSession("current");
-      // } catch {
-      //   console.log("no active session");
-      // }
-
-      // 🔥 login
-      await account.createEmailPasswordSession(email, password);
-
-      const user = await account.get();
-
-      // 🔥 ROLE FETCH (NO CREATE)
-      const userRow = await tablesDB.getRow(
-        DB_ID,
-        USER_TABLE_ID,
-        user.$id
-      );
-
-      const role = userRow.role;
-
-      // 🔥 store user
-      setUser({
-        id: user.$id,
-        email: user.email,
-        role,
-        name: userRow.name,
-        department_id: userRow.department_id,   // 🔥 REQUIRED
-        manager_id: userRow.manager_id,         // 🔥 REQUIRED
-      });
-
-      setEmail("");
-      setPassword("");
-
-      // 🔥 NAVIGATION BASED ON ROLE
-      if (role === "admin") {
-        navigate("/admin-dashboard");
-      } else if (role === "employee") {
-        navigate("/employee-dashboard");
-      } else if (role === "hod") {
-        navigate("/hod-dashboard");
-      } else if (role === "vc") {
-        navigate("/vc-dashboard");
-      } else {
-        alert("Invalid role");
-        navigate("/");
-      }
-
-      console.log("login success");
-
-    } catch (error) {
-      console.log("Login error:", error);
-
-      // ❌ agar DB me row nahi mila
-      alert("User not found in database. Contact admin.");
+      await account.updatePassword(newPassword, password);
+      const current = await account.get();
+      const profile = await tablesDB.getRow(DB_ID, USER_TABLE_ID, current.$id);
+      await tablesDB.updateRow(DB_ID, USER_TABLE_ID, current.$id, { first_login: false });
+      finishLogin(current, { ...profile, first_login: false });
+    } catch (resetError) {
+      setError(resetError.message || "Unable to reset password.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-black/20 backdrop-blur-sm">
-      <div className="w-`w-87.5` p-6 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl text-white">
-        <h2 className="text-2xl font-semibold text-center mb-6">sign in</h2>
-
-        <form onSubmit={handlsubmit} autoComplete="off">
-          <div className="mb-4">
-            <label className="text-sm text-gray-300">Email</label>
+    <div className="flex min-h-screen items-center justify-center bg-slate-950/70 p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-7 shadow-2xl">
+        <h2 className="text-2xl font-bold text-slate-900">
+          {mustReset ? "Set your new password" : "Sign in"}
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">
+          {mustReset
+            ? "Your temporary password must be changed before continuing."
+            : "Use your official organization email."}
+        </p>
+        {error && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+        {mustReset ? (
+          <form onSubmit={resetPassword} className="mt-6 space-y-4">
             <input
-              value={email}
-              onChange={(e)=>setEmail(e.target.value)}
+              type="password"
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              placeholder="New password (8+ characters)"
+              className="w-full rounded-lg border p-3"
+              required
+              minLength={8}
+            />
+            <button disabled={loading} className="w-full rounded-lg bg-green-600 p-3 font-semibold text-white disabled:opacity-50">
+              {loading ? "Saving..." : "Set password and continue"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={submit} className="mt-6 space-y-4">
+            <input
               type="email"
-              placeholder="Enter email"
-              className="w-full mt-1 p-2 rounded-md bg-white/10 border border-white/20 outline-none text-white"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="name@company.com"
+              className="w-full rounded-lg border p-3"
+              required
             />
-          </div>
-
-          <div className="mb-4 relative">
-            <label className="text-sm text-gray-300">Password</label>
             <input
+              type="password"
               value={password}
-              onChange={(e)=> setPassword(e.target.value)}
-              type={show ? "text" : "password"}
-              placeholder="Enter password"
-              className="w-full mt-1 p-2 rounded-md bg-white/10 border border-white/20 outline-none text-white"
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Password"
+              className="w-full rounded-lg border p-3"
+              required
             />
-            <button
-              type="button"
-              onClick={()=> setShow(!show)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-black"
-            >
-              x
-            </button>
-          </div>
-
-          <div className="flex gap-3 mt-5">
-            <button type="submit" className="flex-1 bg-green-600 py-2 rounded-md">
-              sign in
-            </button>
-
-            <button type="button" onClick={closeLogin} className="flex-1 bg-red-600 py-2 rounded-md">
-              Cancel
-            </button>
-          </div>
-        </form>
+            <div className="flex gap-3">
+              <button disabled={loading} className="flex-1 rounded-lg bg-green-600 p-3 font-semibold text-white disabled:opacity-50">
+                {loading ? "Signing in..." : "Sign in"}
+              </button>
+              <button type="button" onClick={closeLogin} className="rounded-lg border px-5">
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );
