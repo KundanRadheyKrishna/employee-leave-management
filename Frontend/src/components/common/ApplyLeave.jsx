@@ -32,11 +32,15 @@ const ApplyLeave = () => {
       return;
     }
     if (form.leave_type !== "half_day" && days > Number(user.leave_balance ?? 20)) {
-      setState({ loading: false, error: "You do not have enough leave balance.", success: "" });
+      setStaemp@gmail.comte({ loading: false, error: "You do not have enough leave balance.", success: "" });
       return;
     }
-    const approverId = user.role === "employee" ? user.manager_id : user.role === "hod" ? user.manager_id : user.id;
-    const currentLevel = user.role === "employee" ? "hod" : user.role === "hod" ? "vc" : "vc";
+    const approverId =
+      user.role === "employee" || user.role === "hod"
+        ? user.manager_id
+        : null;
+    const currentLevel =
+      user.role === "employee" ? "hod" : user.role === "hod" ? "vc" : "admin";
     setState({ loading: true, error: "", success: "" });
     try {
       const leave = await createLeave({

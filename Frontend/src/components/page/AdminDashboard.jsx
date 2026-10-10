@@ -116,6 +116,9 @@ const AdminDashboard = () => {
   const filteredLeaves = useMemo(() => {
     const query = search.trim().toLowerCase();
     return leaves.filter((leave) => {
+      const requester = users.find((user) => user.$id === leave.user_id);
+      const isAdminRequest =
+        leave.current_level === "admin" && requester?.role === "vc";
       const matchesStatus =
         statusFilter === "all" || leave.status === statusFilter;
       const matchesSearch =
@@ -123,18 +126,25 @@ const AdminDashboard = () => {
         [leave.user_id, leave.leave_type, leave.reason, leave.department_id]
           .filter(Boolean)
           .some((value) => String(value).toLowerCase().includes(query));
-      return matchesStatus && matchesSearch;
+      return isAdminRequest && matchesStatus && matchesSearch;
     });
-  }, [leaves, search, statusFilter]);
+  }, [leaves, search, statusFilter, users]);
 
   const stats = useMemo(
-    () => ({
-      total: leaves.length,
-      pending: leaves.filter((leave) => leave.status === "pending").length,
-      approved: leaves.filter((leave) => leave.status === "approved").length,
-      rejected: leaves.filter((leave) => leave.status === "rejected").length,
-    }),
-    [leaves]
+    () => {
+      const isVcAdminRequest = (leave) =>
+        leave.current_level === "admin" &&
+        users.some((user) => user.$id === leave.user_id && user.role === "vc");
+      const adminLeaves = leaves.filter(isVcAdminRequest);
+
+      return {
+        total: adminLeaves.length,
+        pending: adminLeaves.filter((leave) => leave.status === "pending").length,
+        approved: adminLeaves.filter((leave) => leave.status === "approved").length,
+        rejected: adminLeaves.filter((leave) => leave.status === "rejected").length,
+      };
+    },
+    [leaves, users]
   );
 
   const updateLeaveStatus = async (leave, status) => {

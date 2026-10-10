@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import React, { useEffect } from "react";
 import LandingPage from "./components/page/LandingPage";
 import EmployeDashboard from "./components/page/EmployeDashboard";
@@ -10,11 +10,27 @@ import useAuthStore from "./store/authStore";
 
 const App = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const redirectToHomeOnReload = () => {
+    const navigationEntry = performance.getEntriesByType("navigation")[0];
+    const isReload = navigationEntry?.type === "reload" || performance.navigation?.type === 1;
+
+    if (isReload && pathname !== "/") {
+      navigate("/", { replace: true });
+    }
+  };
 
   // scroll fix
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  useEffect(() => {
+    redirectToHomeOnReload();
+    // This check must run only once for the initial document navigation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 🔥 FIX: initUser use kiya (role + login dono yahin se aayega)
   useEffect(() => {

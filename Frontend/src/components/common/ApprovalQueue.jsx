@@ -45,9 +45,21 @@ const ApprovalQueue = ({ level }) => {
     setBusy(row.$id);
     setError("");
     try {
-      const nextLevel = status === "rejected" ? "done" : level === "hod" ? "vc" : "done";
-      const nextApprover = status === "rejected" ? null : level === "hod" ? user.manager_id : null;
-      await updateLeave(row.$id, { status, current_level: nextLevel, approver_id: nextApprover });
+      const isRejected = status === "rejected";
+      const nextLevel = isRejected ? "done" : level === "hod" ? "vc" : "done";
+      const nextApprover = level === "hod" ? user.manager_id : null;
+      const update = {
+        status,
+        current_level: nextLevel,
+      };
+
+      // A rejected request is terminal. Do not send a null approver value:
+      // Appwrite schemas can reject null even though the field is optional.
+      if (!isRejected && nextApprover) {
+        update.approver_id = nextApprover;
+      }
+
+      await updateLeave(row.$id, update);
       let notificationWarning = "";
       await createNotification({
         user_id: row.user_id,
